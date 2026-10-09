@@ -1,0 +1,243 @@
+:root {
+  --bg: #FFE8D6;
+  --card: #FFFDF8;
+  --ink: #3B2A20;
+  --muted: #7A675A;
+  --orange: #F4A259;
+  --orange-dark: #D9822B;
+  --sage: #4F8A76;
+  --line: #EBD3BF;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Nunito", "Segoe UI", system-ui, sans-serif;
+}
+
+.login {
+  width: 100%;
+  max-width: 380px;
+}
+
+/* ---------- Cat ---------- */
+.cat {
+  display: block;
+  width: 190px;
+  margin: 0 auto -14px;
+  position: relative;
+  z-index: 1;
+  overflow: visible;
+}
+
+.paw {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform .45s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.eyes { transform-box: fill-box; transform-origin: center; }
+.login.peek .eyes { animation: blink .5s ease .35s; }
+@keyframes blink { 50% { transform: scaleY(.1); } }
+
+/* Password shown: paws drop down and the face is uncovered */
+.login.peek .paw-left  { transform: translate(-16px, 64px) rotate(-10deg); }
+.login.peek .paw-right { transform: translate(16px, 64px) rotate(10deg); }
+
+/* ---------- Card ---------- */
+.card {
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 22px;
+  padding: 28px 24px 24px;
+  box-shadow: 0 10px 30px rgba(120, 70, 30, .12);
+  position: relative;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.hint {
+  margin: 4px 0 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: .95rem;
+}
+
+label {
+  display: block;
+  margin: 14px 0 6px;
+  font-weight: 700;
+  font-size: .95rem;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  color: var(--ink);
+  background: #fff;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+  outline: none;
+  border-color: var(--orange);
+  box-shadow: 0 0 0 4px rgba(244, 162, 89, .3);
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--sage);
+}
+
+.check input:focus-visible {
+  outline: 3px solid var(--orange);
+  outline-offset: 2px;
+}
+
+button {
+  width: 100%;
+  margin-top: 20px;
+  padding: 13px;
+  font: inherit;
+  font-weight: 800;
+  color: #fff;
+  background: var(--sage);
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background .2s, transform .1s;
+}
+
+button:hover { background: #3F7562; }
+button:active { transform: scale(.98); }
+button:focus-visible { outline: 3px solid var(--orange-dark); outline-offset: 3px; }
+
+
+button:disabled { opacity: .6; cursor: wait; }
+
+/* ---------- Loading overlay: paper folds, or tears ---------- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background: var(--card);
+  border-radius: 20px;
+}
+.overlay[hidden] { display: none; }
+
+.stage {
+  position: relative;
+  width: 150px;
+  height: 180px;
+}
+
+.fold, .tear, .badge { position: absolute; inset: 0; display: none; }
+.fold { perspective: 700px; }
+
+.folding .fold, .torn .tear, .accepted .badge { display: block; }
+.accepted .fold { display: block; }
+
+/* Paper look: ruled lines like a student form */
+.panel, .piece {
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 13px, #D9E3EC 13px 14px),
+    #fff;
+  border: 2px solid var(--line);
+}
+
+/* Folding: three panels of one sheet */
+.panel { position: absolute; left: 0; width: 100%; height: 60px; }
+.p-top { top: 0;    transform-origin: bottom; z-index: 2; border-radius: 8px 8px 0 0; }
+.p-mid { top: 60px; z-index: 1; }
+.p-bot { top: 120px; transform-origin: top; z-index: 3; border-radius: 0 0 8px 8px; }
+
+.folding .p-top { animation: foldDown 2.2s ease-in-out .4s forwards; }
+.folding .p-bot { animation: foldUp 2.2s ease-in-out 1.6s forwards; }
+.folding .fold  { animation: tuck 1s ease-in-out 3.9s forwards; }
+
+@keyframes foldDown { to { transform: rotateX(180deg); background-color: #F3F3F3; } }
+@keyframes foldUp   { to { transform: rotateX(-180deg); background-color: #E9E9E9; } }
+@keyframes tuck     { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px) scale(1.04); } }
+
+/* Accepted: the folded letter stays, with a green check */
+.accepted .p-top { transform: rotateX(180deg); background-color: #F3F3F3; }
+.accepted .p-bot { transform: rotateX(-180deg); background-color: #E9E9E9; }
+.badge {
+  display: none;
+  inset: auto;
+  left: 50%;
+  top: 50%;
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
+  line-height: 56px;
+  text-align: center;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #fff;
+  background: var(--sage);
+  border-radius: 50%;
+  z-index: 5;
+}
+.accepted .badge { display: block; animation: pop .5s cubic-bezier(.34, 1.56, .64, 1) both; }
+@keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+
+/* Torn: two ragged halves fall apart */
+.piece { position: absolute; inset: 0; border-radius: 8px; transform-origin: bottom center; }
+.piece-l {
+  clip-path: polygon(0 0, 52% 0, 46% 12%, 55% 25%, 47% 38%, 54% 52%, 46% 66%, 55% 80%, 48% 92%, 52% 100%, 0 100%);
+  animation: tearL .9s ease-out forwards;
+}
+.piece-r {
+  clip-path: polygon(52% 0, 100% 0, 100% 100%, 52% 100%, 48% 92%, 55% 80%, 46% 66%, 54% 52%, 47% 38%, 55% 25%, 46% 12%);
+  animation: tearR .9s ease-out forwards;
+}
+@keyframes tearL { to { transform: translate(-34px, 10px) rotate(-14deg); } }
+@keyframes tearR { to { transform: translate(34px, 10px) rotate(14deg); } }
+
+.msg {
+  margin: 0;
+  padding: 0 16px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--ink);
+}
+.accepted .msg { color: var(--sage); }
+.torn .msg { color: #C0392B; }
+
+@media (prefers-reduced-motion: reduce) {
+  .paw { transition: none; }
+  .overlay * { animation-duration: .01ms !important; animation-delay: 0s !important; }
+}
