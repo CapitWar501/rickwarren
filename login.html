@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>School Enrollment Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="login" id="login">
+
+    <!-- The cat: paws cover the eyes while the password is hidden -->
+    <svg class="cat" viewBox="0 0 200 150" role="img" aria-label="A cute cat">
+      <!-- ears -->
+      <polygon points="38,60 44,10 86,38" fill="#F4A259"/>
+      <polygon points="162,60 156,10 114,38" fill="#F4A259"/>
+      <polygon points="49,50 52,24 72,38" fill="#F7B8B8"/>
+      <polygon points="151,50 148,24 128,38" fill="#F7B8B8"/>
+      <!-- head -->
+      <ellipse cx="100" cy="85" rx="70" ry="56" fill="#F4A259"/>
+      <!-- stripes -->
+      <path d="M100 30v14M86 32l3 12M114 32l-3 12" stroke="#D9822B" stroke-width="5" stroke-linecap="round"/>
+      <!-- muzzle -->
+      <ellipse cx="100" cy="106" rx="26" ry="18" fill="#FFF3E3"/>
+      <!-- eyes -->
+      <g class="eyes">
+        <circle cx="70" cy="80" r="9" fill="#3B2A20"/>
+        <circle cx="130" cy="80" r="9" fill="#3B2A20"/>
+        <circle cx="73" cy="76" r="3" fill="#fff"/>
+        <circle cx="133" cy="76" r="3" fill="#fff"/>
+      </g>
+      <!-- blush -->
+      <ellipse cx="52" cy="102" rx="9" ry="5" fill="#F28B82" opacity=".55"/>
+      <ellipse cx="148" cy="102" rx="9" ry="5" fill="#F28B82" opacity=".55"/>
+      <!-- nose and mouth -->
+      <polygon points="93,98 107,98 100,106" fill="#E56B7F"/>
+      <path d="M100 106v6M100 112q-8 8-15 2M100 112q8 8 15 2" fill="none" stroke="#3B2A20" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- whiskers -->
+      <path d="M62 108l-34-6M62 114l-32 6M138 108l34-6M138 114l32 6" stroke="#3B2A20" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+      <!-- paws -->
+      <g class="paw paw-left">
+        <ellipse cx="72" cy="82" rx="27" ry="22" fill="#F4A259" stroke="#D9822B" stroke-width="3"/>
+        <path d="M63 92v-8M72 94v-9M81 92v-8" stroke="#D9822B" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <g class="paw paw-right">
+        <ellipse cx="128" cy="82" rx="27" ry="22" fill="#F4A259" stroke="#D9822B" stroke-width="3"/>
+        <path d="M119 92v-8M128 94v-9M137 92v-8" stroke="#D9822B" stroke-width="3" stroke-linecap="round"/>
+      </g>
+    </svg>
+
+    <form class="card" id="form" autocomplete="on">
+      <h1>School enrollment</h1>
+      <p class="hint">Log in to see your enrollment.</p>
+
+      <label for="username">Username</label>
+      <input id="username" name="username" type="text" autocomplete="username" required>
+
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+
+      <label class="check">
+        <input type="checkbox" id="toggle">
+        <span>Show password</span>
+      </label>
+
+      <button type="submit">Log in</button>
+
+      <!-- Loading / result overlay -->
+      <div class="overlay" id="overlay" hidden>
+        <div class="stage">
+          <div class="fold">
+            <div class="panel p-top"></div>
+            <div class="panel p-mid"></div>
+            <div class="panel p-bot"></div>
+          </div>
+          <div class="tear">
+            <div class="piece piece-l"></div>
+            <div class="piece piece-r"></div>
+          </div>
+          <div class="badge">&#10003;</div>
+        </div>
+        <p class="msg" id="msg" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    const login = document.getElementById('login');
+    const password = document.getElementById('password');
+    const toggle = document.getElementById('toggle');
+
+    // Checked = show password = cat uncovers its face
+    toggle.addEventListener('change', () => {
+      const show = toggle.checked;
+      password.type = show ? 'text' : 'password';
+      login.classList.toggle('peek', show);
+    });
+
+    const overlay = document.getElementById('overlay');
+    const msg = document.getElementById('msg');
+    const button = document.querySelector('button[type="submit"]');
+    const username = document.getElementById('username');
+
+    // DEMO ONLY: replace this with a real check against your database/API
+    function checkLogin(user, pass) {
+      return new Promise((resolve) => {
+        resolve(user === 'student' && pass === 'meow123');
+      });
+    }
+
+    document.getElementById('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (button.disabled) return;
+      button.disabled = true;
+
+      // Paper folds for 5 seconds while the data is checked
+      overlay.hidden = false;
+      overlay.className = 'overlay folding';
+      msg.textContent = 'Authenticating...';
+
+      const [ok] = await Promise.all([
+        checkLogin(username.value.trim(), password.value),
+        new Promise((r) => setTimeout(r, 5000))
+      ]);
+
+      if (ok) {
+        overlay.className = 'overlay accepted';
+        msg.textContent = 'Data accepted. Welcome!';
+        // window.location.href = 'dashboard.html'; // go to your next page
+      } else {
+        overlay.className = 'overlay torn';
+        msg.textContent = 'Wrong password. Please enter it again.';
+        setTimeout(() => {
+          overlay.hidden = true;
+          overlay.className = 'overlay';
+          password.value = '';
+          button.disabled = false;
+          password.focus();
+        }, 2500);
+      }
+    });
+  </script>
+</body>
+</html>
